@@ -1,4 +1,36 @@
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted, useTemplateRef } from 'vue';
+
+const botSquad = useTemplateRef<HTMLElement>('botSquad');
+const eyeTransform = ref('translate(0, 0)');
+
+const handleMouseMove = (event: MouseEvent) => {
+  if (!botSquad.value) return;
+
+  const rect = botSquad.value.getBoundingClientRect();
+  const botCenterX = rect.left + rect.width / 2;
+  const botCenterY = rect.top + rect.height / 2;
+
+  const deltaX = event.clientX - botCenterX;
+  const deltaY = event.clientY - botCenterY;
+  const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+  // 1. Calculate how much they should "care" (0 to 1)
+  // They start looking away after 400px
+  const influence = Math.max(0, 1 - distance / 400);
+  
+  const maxMove = 2.5; 
+  const angle = Math.atan2(deltaY, deltaX);
+  
+  // 2. Apply the influence to the move calculation
+  const moveX = Math.cos(angle) * maxMove * influence;
+  const moveY = Math.sin(angle) * maxMove * influence;
+
+  eyeTransform.value = `translate(${moveX}px, ${moveY}px)`;
+};
+
+onMounted(() => window.addEventListener('mousemove', handleMouseMove));
+onUnmounted(() => window.removeEventListener('mousemove', handleMouseMove));
 </script>
 
 <template>
@@ -6,8 +38,42 @@
     <nav class="navbar">
       <div class="nav-container">
         <div class="logo">Era Leap</div>
-        <button class="contact-btn">Contact Us</button>
-      </div>
+
+        <div class="nav-right">
+          <div class="robot-squad" ref="botSquad">
+            
+            <div class="mini-bot bot-purple">
+              <div class="antenna"></div>
+              <div class="bot-head">
+                <div class="bot-eye">
+                  <div class="pupil" :style="{ transform: eyeTransform }"></div>
+                </div>
+                <div class="bot-eye">
+                  <div class="pupil" :style="{ transform: eyeTransform }"></div>
+                </div>
+                <div class="bot-mouth"></div> 
+              </div>
+              <div class="bot-body">
+                <div class="detail"></div>
+              </div>
+            </div>
+            
+            <div class="mini-bot bot-blue">
+              <div class="bot-head">
+                <div class="bot-eye">
+                  <div class="pupil" :style="{ transform: eyeTransform }"></div>
+                </div>
+                <div class="bot-eye">
+                  <div class="pupil" :style="{ transform: eyeTransform }"></div>
+                </div>
+                <div class="bot-mouth"></div> 
+              </div>
+              <div class="bot-body"></div>
+            </div>
+
+          </div> <button class="contact-btn">Contact Us</button>
+        </div> 
+      </div> 
     </nav>
 
     <section class="hero">
@@ -32,10 +98,10 @@
         <h2 class="intro-title">About Us</h2>
         <div class="intro-content">
           <p>
-            <span class="company-name">Era Leap</span> is a technology-driven company specializing in artificial intelligence and digital innovation. We leverage advanced AI algorithms, data analytics, and automation tools designed to support fast, accurate decision-making in high-risk, complex environments.
+            <span class="company-name">EraLeap</span> is a technology-driven company specializing in artificial intelligence and digital innovation. We leverage advanced AI algorithms, data analytics, and automation tools designed to support fast, accurate decision-making in high-risk, complex environments.
           </p>
           <p>
-            Leveraging our expertise in these domains, we provide accessible and efficient AI transformation solutions that help Canadian businesses modernize operations and make smarter, data-driven decisions.
+            Leveraging our expertise in these domains, we provide accessible and efficient AI transformation solutions that help businesses modernize operations and make smarter, data-driven decisions.
           </p>
           <p>
             Our vision is to be a technology-focused value creator: building AI systems capable of high-stakes decision-making while delivering practical solutions that help enterprises thrive in the era of intelligent automation.
@@ -88,6 +154,147 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.nav-right {
+  display: flex; align-items: flex-end;
+  gap: 25px;
+}
+
+/* --- ROBOT SQUAD LAYOUT --- */
+.robot-squad {
+  display: flex; 
+  gap: 10px;
+  align-items: flex-end; 
+  padding-bottom: 8px;
+}
+
+.mini-bot {
+  display: flex; 
+  flex-direction: column; 
+  align-items: center;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+/* --- ROBOT 1: PURPLE SPECIALIST --- */
+.bot-purple .bot-head {
+  width: 30px; height: 20px;
+  background: #aa3bff;
+  border-radius: 5px;
+  display: flex; justify-content: space-evenly; align-items: center;
+  position: relative; /* Anchor for the mouth */
+}
+.bot-purple .bot-body {
+  width: 20px; height: 10px;
+  background: #8e2cdc;
+  border-radius: 4px 4px 0 0;
+}
+.bot-purple .detail {
+  width: 6px; height: 3px; background: rgba(255,255,255,0.3); border-radius: 1px; margin: 2px auto 0;
+}
+.bot-purple .antenna {
+  width: 2px; height: 6px; background: #aa3bff; margin-bottom: -1px;
+}
+
+/* --- ROBOT 2: BLUE OBSERVER --- */
+.bot-blue .bot-head {
+  width: 22px; height: 22px;
+  background: #00d2ff;
+  border-radius: 50%;
+  display: flex; justify-content: space-evenly; align-items: center;
+  position: relative; /* Anchor for the mouth */
+}
+.bot-blue .bot-body {
+  width: 16px; height: 6px;
+  background: #0099cc;
+  border-radius: 10px 10px 0 0;
+}
+
+/* --- SHARED FACE MECHANICS --- */
+.bot-eye {
+  width: 7px; height: 7px;
+  background: white; border-radius: 50%;
+  position: relative; overflow: hidden;
+  z-index: 2;
+}
+
+.pupil {
+  width: 3.5px; height: 3.5px;
+  background: #08060d; border-radius: 50%;
+  position: absolute;
+  top: 1.75px; left: 1.75px;
+  transition: transform 0.05s ease-out;
+}
+
+/* The Mouth - Lifted slightly to stay on the face */
+.bot-mouth {
+  position: absolute;
+  bottom: 3px; /* Lifted from 4px to avoid the body */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 2px;
+  transition: all 0.2s ease;
+  z-index: 1;
+}
+
+/* --- INTERACTION LOGIC --- */
+
+/* Smile and Perk Up when Button is Hovered */
+.nav-right:has(.contact-btn:hover) .bot-mouth {
+  height: 5px;
+  width: 12px;
+  background: transparent;
+  border-bottom: 2px solid #000;
+  border-radius: 0 0 10px 10px;
+  bottom: 4px; /* Adjusting slightly for the curve height */
+}
+
+.nav-right:has(.contact-btn:hover) .mini-bot {
+  transform: translateY(-5px) scale(1.05);
+}
+
+/* --- LOGO & BUTTON --- */
+.logo {
+  font-family: 'Comfortaa', cursive;
+  font-weight: 700;
+  color: #fff;
+  font-size: 1.5rem;
+}
+
+.contact-btn {
+  background: #fff;
+  color: #08060d;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.contact-btn:hover {
+  background: #f4f3ec;
+}
+
+/* UI Elements */
+.logo { font-family: 'Comfortaa'; font-weight: 700; color: white; font-size: 1.5rem; }
+.contact-btn {
+  background: white; color: black; border: none;
+  padding: 12px 24px; border-radius: 50px;
+  font-weight: 600; cursor: pointer; transition: 0.2s;
+}
+.contact-btn:hover { background: #f0f0f0; transform: scale(1.05); }
+
+/* Rest of the UI */
+.logo { font-family: 'Comfortaa'; font-weight: 700; color: white; font-size: 1.5rem; }
+.contact-btn {
+  background: white; color: black; border: none;
+  padding: 12px 24px; border-radius: 50px;
+  font-weight: 600; cursor: pointer;
 }
 
 .logo {
