@@ -707,4 +707,19 @@ onUnmounted(() => window.removeEventListener('mousemove', handleMouseMove));
 
 .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
+
+/* MOBILE RESPONSIVE STYLES */
+@media (max-width: 768px) and (orientation: portrait) {
+  .hero {
+    margin-top: 70px; /* Increased top padding to push the video background further down */
+  }
+
+  .headline {
+    font-size: clamp(0.9rem, 5.5vw, 1.3rem); /* Further reduced font size to prevent overlapping */
+    padding-top: 25%; /* Removed percentage padding to allow proper centering in the overlay */
+    letter-spacing: 1px; /* Tighter letter spacing for better fit on narrow screens */
+    line-height: 1.3; /* Adjusted line height for readability */
+    max-width: 85%; /* Prevent text from touching the edges of the viewport */
+  }
+}
 </style>
