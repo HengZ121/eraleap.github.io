@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/eraleap-website/', // Replace with your repository name
+  // This repo is a GitHub *user site* (eraleap.github.io), so assets must be served from root.
+  base: '/',
   plugins: [vue()],
 })
-
