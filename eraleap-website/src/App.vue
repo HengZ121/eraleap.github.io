@@ -708,18 +708,58 @@ onUnmounted(() => window.removeEventListener('mousemove', handleMouseMove));
 .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 
-/* MOBILE RESPONSIVE STYLES */
-@media (max-width: 768px) and (orientation: portrait) {
+/* SMALL SCREEN STYLES */
+@media (max-width: 1150px) and (min-width: 768px) {
   .hero {
     margin-top: 70px; /* Increased top padding to push the video background further down */
   }
 
   .headline {
-    font-size: clamp(0.9rem, 5.5vw, 1.3rem); /* Further reduced font size to prevent overlapping */
-    padding-top: 25%; /* Removed percentage padding to allow proper centering in the overlay */
+    font-size: clamp(1rem, 3.5vw, 2rem); /* Further reduced font size to prevent overlapping */
+    padding-top: 20%; /* Removed percentage padding to allow proper centering in the overlay */
     letter-spacing: 1px; /* Tighter letter spacing for better fit on narrow screens */
     line-height: 1.3; /* Adjusted line height for readability */
     max-width: 85%; /* Prevent text from touching the edges of the viewport */
+  }
+}
+
+/* MOBILE RESPONSIVE STYLES */
+@media (max-width: 1150px) and (orientation: portrait) {
+  .nav-container {
+    margin: 0 10px;
+    padding: 0 10px;
+  }
+
+  .logo {
+    font-size: 1.2rem;
+  }
+
+  .nav-right {
+    gap: 10px;
+  }
+
+  .robot-squad {
+    transform: scale(0.8); /* Shrink robots */
+    transform-origin: bottom right;
+    padding-bottom: 5px;
+    gap: 6px;
+  }
+
+  .contact-btn {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+
+  .hero {
+    margin-top: 70px; /* Increased top padding to push the video background further down */
+  }
+
+  .headline {
+    font-size: clamp(0.75rem, 5vw, 1.1rem); /* Even smaller to avoid overlap */
+    padding-top: 20%;
+    letter-spacing: 1px; /* Tighter letter spacing for better fit on narrow screens */
+    line-height: 1.2;
+    max-width: 90%;
   }
 }
 </style>
