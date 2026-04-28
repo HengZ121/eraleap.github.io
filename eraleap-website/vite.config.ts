@@ -3,5 +3,7 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/eraleap-website/', // Replace with your repository name
   plugins: [vue()],
 })
+
