@@ -1,8 +1,51 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, useTemplateRef } from 'vue';
+import { ref, reactive, onMounted, onUnmounted, useTemplateRef } from 'vue';
 
 const botSquad = useTemplateRef<HTMLElement>('botSquad');
 const eyeTransform = ref('translate(0, 0)');
+const showModal = ref(false);
+const isSubmitting = ref(false);
+
+const contactForm = reactive({
+  name: '',
+  email: '',
+  inquiry: ''
+});
+
+const toggleModal = () => {
+  showModal.value = !showModal.value;
+  if (!showModal.value) {
+    contactForm.name = '';
+    contactForm.email = '';
+    contactForm.inquiry = '';
+  }
+};
+
+const handleSubmit = async () => {
+  const lastSent = localStorage.getItem('last_inquiry_date');
+  const now = new Date().getTime();
+  
+  if (lastSent && now - parseInt(lastSent) < 24 * 60 * 60 * 1000) {
+    alert('We have received your inquiry today. Please give us some time to get back to you or you can resend another inquiry tomorrow.');
+    return;
+  }
+
+  isSubmitting.value = true;
+  
+  // Construct the mailto link dynamically
+  const subject = encodeURIComponent(`Generak Inquiry from ${contactForm.name}`);
+  const body = encodeURIComponent(
+    `Name: ${contactForm.name}\n` +
+    `Contact Email: ${contactForm.email}\n\n` +
+    `Inquiry:\n${contactForm.inquiry}`
+  );
+
+  window.location.href = `mailto:heng.zhang@eraleap.com?subject=${subject}&body=${body}`;
+
+  localStorage.setItem('last_inquiry_date', now.toString());
+  isSubmitting.value = false;
+  toggleModal();
+};
 
 const handleMouseMove = (event: MouseEvent) => {
   if (!botSquad.value) return;
@@ -37,7 +80,7 @@ onUnmounted(() => window.removeEventListener('mousemove', handleMouseMove));
   <div class="page">
     <nav class="navbar">
       <div class="nav-container">
-        <div class="logo">Era Leap</div>
+        <div class="logo">EraLeap</div>
 
         <div class="nav-right">
           <div class="robot-squad" ref="botSquad">
@@ -71,7 +114,7 @@ onUnmounted(() => window.removeEventListener('mousemove', handleMouseMove));
               <div class="bot-body"></div>
             </div>
 
-          </div> <button class="contact-btn">Contact Us</button>
+          </div> <button class="contact-btn" @click="toggleModal">Contact Us</button>
         </div> 
       </div> 
     </nav>
@@ -89,7 +132,7 @@ onUnmounted(() => window.removeEventListener('mousemove', handleMouseMove));
       </video>
 
       <div class="overlay">
-        <h1 class="headline">Decisions Powered by the Intelligent Solutions</h1>
+        <h1 class="headline">Smarter Decisions Powered by the Intelligence</h1>
       </div>
     </section>
 
@@ -98,10 +141,10 @@ onUnmounted(() => window.removeEventListener('mousemove', handleMouseMove));
         <h2 class="intro-title">About Us</h2>
         <div class="intro-content">
           <p>
-            <span class="company-name">EraLeap</span> is a technology-driven company specializing in artificial intelligence and digital innovation. We leverage advanced AI algorithms, data analytics, and automation tools designed to support fast, accurate decision-making in high-risk, complex environments.
+            <span class="company-name">EraLeap</span> is a technology-driven company specializing in artificial intelligence and digital innovation. We leverage advanced AI techniques, data analytics, and automation tools designed to support fast, accurate decision-making in high-risk, complex environments.
           </p>
           <p>
-            Leveraging our expertise in these domains, we provide accessible and efficient AI transformation solutions that help businesses modernize operations and make smarter, data-driven decisions.
+            Leveraging our expertise in these domains, we provide bespoke AI transformation solutions that help businesses modernize operations and make smarter, data-driven decisions.
           </p>
           <p>
             Our vision is to be a technology-focused value creator: building AI systems capable of high-stakes decision-making while delivering practical solutions that help enterprises thrive in the era of intelligent automation.
@@ -110,10 +153,77 @@ onUnmounted(() => window.removeEventListener('mousemove', handleMouseMove));
       </div>
     </section>
 
+    <section class="what-we-do">
+      <div class="intro-container">
+        <h2 class="intro-title">What We Do</h2>
+        <div class="services-grid">
+          <div class="service-card">
+            <div class="service-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31"/><path d="M14 2v7.31"/><path d="M8.5 2h7"/><path d="M14 9.31a6.5 6.5 0 1 1-4 0"/><path d="M5.52 16h12.96"/></svg>
+            </div>
+            <h3>R&D</h3>
+            <p>Customized AI agent solutions tailored for specialized operational needs.</p>
+          </div>
+          <div class="service-card">
+            <div class="service-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>
+            </div>
+            <h3>Advanced AI</h3>
+            <p>Comprehensive tool training and seamless system integration for enterprise workflows.</p>
+          </div>
+          <div class="service-card">
+            <div class="service-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+            </div>
+            <h3>Quant System</h3>
+            <p>High-performance, real-time quantitative systems for data-driven decision making.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT MODAL -->
+    <Transition name="fade">
+      <div v-if="showModal" class="modal-overlay" @click.self="toggleModal">
+        <div class="modal-content">
+          <button class="close-btn" @click="toggleModal">&times;</button>
+          <h2 class="modal-title">Get in Touch</h2>
+          <p class="modal-subtitle">We'll get back to you as soon as possible.</p>
+          
+          <form @submit.prevent="handleSubmit" class="contact-form">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" id="name" v-model="contactForm.name" required placeholder="Your Name" />
+            </div>
+            
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" v-model="contactForm.email" required placeholder="your@email.com" />
+            </div>
+            
+            <div class="form-group">
+              <label for="inquiry">Inquiry</label>
+              <textarea 
+                id="inquiry" 
+                v-model="contactForm.inquiry" 
+                required 
+                placeholder="How can we help you?"
+                rows="5"
+              ></textarea>
+            </div>
+            
+            <button type="submit" class="submit-btn" :disabled="isSubmitting">
+              {{ isSubmitting ? 'Sending...' : 'Send Message' }}
+            </button>
+          </form>
+        </div>
+      </div>
+    </Transition>
+
     <footer class="site-footer">
       <div class="footer-container">
         <p class="ai-note">
-          Pioneered with vibe-coding and the generative models, then manually polished by our humans to ensure everything is just right. We're all about embracing the future, responsibly. If something looks off, please contact us.
+          Some media are created with vibe-coding and the generative models, then manually polished by our humans to ensure everything is just right. We're all about embracing the fresh topics, responsibly. If something looks off, please contact us.
         </p>
         <p class="copyright">&copy; 2026 Era Leap. All rights reserved.</p>
       </div>
@@ -464,4 +574,137 @@ onUnmounted(() => window.removeEventListener('mousemove', handleMouseMove));
   opacity: 0.6;
   text-align: center;
 }
+
+/* WHAT WE DO SECTION */
+.what-we-do {
+  padding: 120px 20px;
+  background-color: #d8f9ff;
+  color: #222;
+  width: 100%;
+  border-top: 1px solid #eee;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.service-icon {
+  margin-bottom: 20px;
+  color: #000;
+}
+
+.service-card h3 {
+  font-family: 'Comfortaa', cursive;
+  font-size: 1.4rem;
+  margin-bottom: 15px;
+  color: #000;
+}
+
+.service-card p {
+  color: #555;
+  line-height: 1.6;
+}
+
+/* MODAL STYLES */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.modal-content {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  color: #333;
+}
+
+.modal-title {
+  font-family: 'Comfortaa', cursive;
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: #000;
+}
+
+.modal-subtitle {
+  margin-bottom: 30px;
+  color: #666;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.form-group input, 
+.form-group textarea {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.submit-btn {
+  background: #aa3bff; /* Matches purple bot */
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+  margin-top: 10px;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: #8e2cdc;
+  transform: translateY(-2px);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #999;
+}
+
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
 </style>
